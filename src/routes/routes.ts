@@ -687,7 +687,7 @@ router.get(
 *              message: "Unexpected error"
 *              errors: []
 *       401:
-*         description: User not authorized
+*         description: Unathorized
 *         content:
 *          application/json:
 *           example:
@@ -702,6 +702,65 @@ router.patch(
   UserController.updateProfile
 );
 
+/**
+* @openapi
+* '/api/user/{id}':
+*  get:
+*     tags:
+*     - PROFILE
+*     summary: Get user by MongoDB id
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: path
+*       name: id
+*       schema:
+*         type: string
+*       required: true
+*       description: The MangoDB id of the user
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     responses:
+*       200:
+*         description: User
+*         content:
+*          application/json:
+*           example:
+*             id: "userId"
+*             name: "Alex"
+*             surname: "Smith"
+*             email: "user@gmail.com"
+*             isAdmin: false
+*             education: null
+*             specialty: null
+*             yearOfRelease: null
+*             place: null
+*             phoneNumber: "+380123456789"
+*             workPlace: null
+*             positionAtWork: null
+*             shortBiography: null
+*             educationAndGoals: null
+*             avatar: null
+*             createdAt: "time"
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example:
+*                "message": "Validation error"
+*                "errors": []
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*                "message": "User not authorized"
+*                "errors": []
+*/
 router.get(
   UserRouteEndpoint.USER_BY_ID,
   authMiddleware,
