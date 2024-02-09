@@ -99,11 +99,32 @@ router.post(
 *             "password": "pass123"
 *     responses:
 *       200:
-*         description: Product created
+*         description: Login successful
 *         content:
 *          application/json:
 *           example:
-*             "user": "642a0de05f16e6dad68efdad"
+*             {
+*                 "accessToken": "accessToken",
+*                 "refreshToken": "refreshToken",
+*                 "user": {
+*                     "id": "id",
+*                     "name": "name",
+*                     "surname": "surname",
+*                     "email": "email",
+*                     "isAdmin": false,
+*                     "education": null,
+*                     "specialty": null,
+*                     "yearOfRelease": null,
+*                     "place": null,
+*                     "phoneNumber": "number",
+*                     "workPlace": null,
+*                     "positionAtWork": null,
+*                     "shortBiography": null,
+*                     "educationAndGoals": null,
+*                     "avatar": null,
+*                     "createdAt": "time",
+*                 }
+*             }
 *       400:
 *         description: Bad request
 *         content:
@@ -125,17 +146,54 @@ router.get(
 
 /**
 * @openapi
-* '/api/auth/login':
+* '/api/auth/refresh':
 *  get:
 *     tags:
 *     - AUTHENTICATION
-*     summary: Get refresh token
+*     summary: Login by refresh token
 *     requestBody:
 *       required: true
 *       content:
 *         application/json:
 *           example:
-*             reftreshToken: "token"
+*             {
+*               "reftreshToken": "token"
+*             }
+*     responses:
+*       200:
+*         description: Login successful
+*         content:
+*          application/json:
+*           example:
+*             {
+*                 "accessToken": "accessToken",
+*                 "refreshToken": "refreshToken",
+*                 "user": {
+*                     "id": "id",
+*                     "name": "name",
+*                     "surname": "surname",
+*                     "email": "email",
+*                     "isAdmin": false,
+*                     "education": null,
+*                     "specialty": null,
+*                     "yearOfRelease": null,
+*                     "place": null,
+*                     "phoneNumber": "number",
+*                     "workPlace": null,
+*                     "positionAtWork": null,
+*                     "shortBiography": null,
+*                     "educationAndGoals": null,
+*                     "avatar": null,
+*                     "createdAt": "time",
+*                 }
+*             }
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
 */
 router.get(
   AuthRouteEndpoint.REFRESH,
@@ -143,8 +201,41 @@ router.get(
   AuthController.refresh
 );
 
+/**
+* @openapi
+* '/api/auth/logout':
+*  get:
+*     tags:
+*     - AUTHENTICATION
+*     summary: Logout
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           example:
+*             {
+*               "reftreshToken": "token"
+*             }
+*     responses:
+*       200:
+*         description: Logout successful
+*         content:
+*          application/json:
+*           example: {
+*             "message": "You successful logout"
+*           }
+*
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
+*/
 router.post(
   AuthRouteEndpoint.LOGOUT,
+  body('refreshToken'),
   AuthController.logout
 );
 

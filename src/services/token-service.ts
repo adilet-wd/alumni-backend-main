@@ -46,6 +46,7 @@ class Service {
     await TokenModel.deleteOne({ refreshToken });
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   async findToken (refreshToken: string): Promise< (Document<unknown, {}, Token> & Token & { _id: Types.ObjectId }) | null> {
     return await TokenModel.findOne({ refreshToken });
   }

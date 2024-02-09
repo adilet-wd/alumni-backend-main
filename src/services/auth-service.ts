@@ -68,6 +68,14 @@ class Service {
   }
 
   async logout (refreshToken: string): Promise<void> {
+    if (refreshToken === null || refreshToken === undefined) {
+      throw ApiError.UnauthorizedError();
+    }
+    const tokenFromDB = await TokenService.findToken(refreshToken);
+    console.log(tokenFromDB);
+    if (tokenFromDB === null || tokenFromDB === undefined) {
+      throw ApiError.UnauthorizedError();
+    }
     await TokenService.removeToken(refreshToken);
   }
 
@@ -101,7 +109,7 @@ class Service {
     }
 
     const userData = TokenService.validateRefreshToken(refreshToken);
-    const tokenFromDB = TokenService.findToken(refreshToken);
+    const tokenFromDB = await TokenService.findToken(refreshToken);
 
     if (userData == null || typeof userData === 'string' || tokenFromDB === null) {
       throw ApiError.UnauthorizedError();
