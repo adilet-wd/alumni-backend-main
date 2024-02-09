@@ -718,7 +718,7 @@ router.patch(
 *       schema:
 *         type: string
 *       required: true
-*       description: The MangoDB id of the user
+*       description: The MongoDB id of the user
 *     - in: header
 *       name: Authorization
 *       schema:
@@ -802,7 +802,7 @@ enum NewsRouteEndpoint {
 *             properties:
 *               title:
 *                 type: string
-*                 description: The news title.
+*                 description: The news' title.
 *               shortDescribe:
 *                 type: string
 *                 description: Short description of the news.
@@ -926,6 +926,50 @@ router.get(
   NewsController.getNews
 );
 
+/**
+* @openapi
+* '/api/news/{id}':
+*  get:
+*     tags:
+*     - NEWS
+*     summary: Get news by MongoDB id
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: path
+*       name: id
+*       schema:
+*         type: string
+*       required: true
+*       description: The MongoDB id of the news
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     responses:
+*       200:
+*         description: News
+*         content:
+*          application/json:
+*           example:
+*           - "id": "newsId"
+*             "title": "NewsTitle"
+*             "poster": "poster"
+*             "shortDescribe": "ShortDescription"
+*             "content": [{"title": "Section1", "paragraph": "innerText"}]
+*             "newsImages": [ "newsImage", "newsImage"]
+*             "lastUpdate": time
+*             "updatedBy": "user@gmail.com"
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*                "message": "User not authorized"
+*                "errors": []
+*/
 router.get(
   NewsRouteEndpoint.NEWS_BY_ID,
   authMiddleware,
@@ -933,6 +977,85 @@ router.get(
   NewsController.getNewsById
 );
 
+/**
+* @openapi
+* '/api/news/update-news/{id}':
+*  put:
+*     tags:
+*     - NEWS
+*     summary: Update news by MongoDB id
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: path
+*       name: id
+*       schema:
+*         type: string
+*       required: true
+*       description: The MongoDB id of the news
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               title:
+*                 type: string
+*                 description: The news' title.
+*               shortDescribe:
+*                 type: string
+*                 description: Short description of the news.
+*               posters:
+*                 type: file
+*                 description: The poster for the news.
+*               content:
+*                 type: object
+*                 description: The content of the news.
+*                 properties:
+*                  title:
+*                    type: string
+*                    description: The title of the section.
+*                  paragraph:
+*                    type: string
+*                    description: The text of the section.
+*               newsImages:
+*                 type: files
+*                 description: Images related to the news.
+*           example:
+*             title: "Title"
+*             shortDescribe: "ShortDescription"
+*             posters: "poster"
+*             content: {"title": "Section1", "paragraph": "innerText"}
+*             newsImages: "newsImages"
+*     responses:
+*       200:
+*         description: News successful updated
+*         content:
+*          application/json:
+*           example:
+*           - "message": "News successful created"
+*             "news":
+*             - "id": "newsId"
+*               "title": "NewsTitle"
+*               "poster": "poster"
+*               "shortDescribe": "ShortDescription"
+*               "content": [{"title": "Section1", "paragraph": "innerText"}]
+*               "newsImages": [ "newsImage", "newsImage"]
+*               "lastUpdate": time
+*               "updatedBy": "user@gmail.com"
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {"message": "You are not a admin", "errors": []}
+*/
 router.put(
   NewsRouteEndpoint.UPDATE_NEWS,
   authMiddleware,
@@ -945,6 +1068,48 @@ router.put(
   async (req: RequestForMulter, res, next) => await NewsController.updateNewById(req, res, next)
 );
 
+/**
+* @openapi
+* '/api/news/delete-news/{id}':
+*  delete:
+*     tags:
+*     - NEWS
+*     summary: Delete news by MongoDB id
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: path
+*       name: id
+*       schema:
+*         type: string
+*       required: true
+*       description: The MongoDB id of the news
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     responses:
+*       200:
+*         description: News successful deleted
+*         content:
+*          application/json:
+*           example:
+*           - "message": "News successful deleted"
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {"message": "You are not a admin", "errors": []}
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
+*/
 router.delete(
   NewsRouteEndpoint.DELETE_NEWS,
   authMiddleware,
