@@ -476,6 +476,56 @@ enum UserRouteEndpoint {
   USERS = '/users',
 }
 
+/**
+* @openapi
+* '/api/users':
+*  get:
+*     tags:
+*     - PROFILE
+*     summary: Get users
+*     parameters:
+*     - in: query
+*       name: limit
+*       schema:
+*         type: integer
+*       required: false
+*       description: The number of items to return per page
+*     - in: query
+*       name: page
+*       schema:
+*         type: integer
+*       required: false
+*       description: The page number to return
+*     responses:
+*       200:
+*         description: Users list
+*         content:
+*          application/json:
+*           example:
+*             total: 10
+*             totalPages: 10
+*             currentPage: 1
+*             hasNextPage: true
+*             hasPrevPage: false
+*             perPage: 1
+*             results:
+*             - id: "userId"
+*               name: "Alex"
+*               surname: "Smith"
+*               email: "user@gmail.com"
+*               isAdmin: false
+*               education: null
+*               specialty: null
+*               yearOfRelease: null
+*               place: null
+*               phoneNumber: "+380123456789"
+*               workPlace: null
+*               positionAtWork: null
+*               shortBiography: null
+*               educationAndGoals: null
+*               avatar: null
+*               createdAt: "time"
+*/
 router.get(
   UserRouteEndpoint.USERS,
   query('limit').default('10'),
@@ -483,6 +533,52 @@ router.get(
   UserController.getUsers
 );
 
+/**
+* @openapi
+* '/api/user/profile':
+*  get:
+*     tags:
+*     - PROFILE
+*     summary: Get user by refresh token
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     responses:
+*       200:
+*         description: Users list
+*         content:
+*          application/json:
+*           example:
+*               id: "userId"
+*               name: "Alex"
+*               surname: "Smith"
+*               email: "user@gmail.com"
+*               isAdmin: false
+*               education: null
+*               specialty: null
+*               yearOfRelease: null
+*               place: null
+*               phoneNumber: "+380123456789"
+*               workPlace: null
+*               positionAtWork: null
+*               shortBiography: null
+*               educationAndGoals: null
+*               avatar: null
+*               createdAt: "time"
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
+*/
 router.get(
   UserRouteEndpoint.PROFILE,
   authMiddleware,
