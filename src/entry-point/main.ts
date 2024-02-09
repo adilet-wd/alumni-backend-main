@@ -17,6 +17,15 @@ const options = {
     info: {
       title: 'Express API with Swagger',
       version: '1.0.0'
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
     }
   },
   apis: ['./src/routes/routes.ts'] // files containing annotations as above

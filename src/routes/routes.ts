@@ -48,13 +48,36 @@ enum AuthRouteEndpoint {
 *       required: true
 *       content:
 *         application/json:
-*           example:
-*             "phoneNumber": "+380123456789"
-*             "email": "user@gmail.com"
-*             "password": "pass123"
-*             "confirmPassword": "pass123"
-*             "name": "Alex"
-*             "surname": "Smith"
+*           schema:
+*             type: object
+*             properties:
+*               phoneNumber:
+*                 type: string
+*                 example: "+380123456789"
+*               email:
+*                 type: string
+*                 example: "user@gmail.com"
+*               password:
+*                 type: string
+*                 example: "pass123"
+*                 minLength: 3
+*                 maxLength: 32
+*                 description: "Password must be between 3 and 32 characters"
+*               confirmPassword:
+*                 type: string
+*                 example: "pass123"
+*               name:
+*                 type: string
+*                 example: "Alex"
+*                 minLength: 2
+*                 maxLength: 32
+*                 description: "Name must be between 2 and 32 characters"
+*               surname:
+*                 type: string
+*                 example: "Smith"
+*                 minLength: 2
+*                 maxLength: 32
+*                 description: "Surname must be between 2 and 32 characters"
 *     responses:
 *       200:
 *         description: User created
@@ -69,8 +92,7 @@ enum AuthRouteEndpoint {
 *             example:
 *                "message": "User already exist"
 *                "errors": []
-*/
-router.post(
+*/router.post(
   AuthRouteEndpoint.REGISTER,
   emailValidation,
   passwordValidation('password'),
@@ -147,7 +169,7 @@ router.get(
 /**
 * @openapi
 * '/api/auth/refresh':
-*  get:
+*  post:
 *     tags:
 *     - AUTHENTICATION
 *     summary: Login by refresh token
@@ -157,7 +179,7 @@ router.get(
 *         application/json:
 *           example:
 *             {
-*               "reftreshToken": "token"
+*               "refreshToken": "token"
 *             }
 *     responses:
 *       200:
@@ -195,7 +217,7 @@ router.get(
 *               "message": "User not authorized"
 *               "errors": []
 */
-router.get(
+router.post(
   AuthRouteEndpoint.REFRESH,
   body('refreshToken'),
   AuthController.refresh
@@ -204,7 +226,7 @@ router.get(
 /**
 * @openapi
 * '/api/auth/logout':
-*  get:
+*  post:
 *     tags:
 *     - AUTHENTICATION
 *     summary: Logout
@@ -214,7 +236,7 @@ router.get(
 *         application/json:
 *           example:
 *             {
-*               "reftreshToken": "token"
+*               "refreshToken": "token"
 *             }
 *     responses:
 *       200:
@@ -239,6 +261,66 @@ router.post(
   AuthController.logout
 );
 
+/**
+* @openapi
+* '/api/auth/change-password':
+*  post:
+*     tags:
+*     - AUTHENTICATION
+*     summary: Change password
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               oldPassword:
+*                 type: string
+*                 example: "oldPassword"
+*               newPassword:
+*                 type: string
+*                 example: "newPassword"
+*                 minLength: 3
+*                 maxLength: 32
+*                 description: "Password must be between 3 and 32 characters"
+*               confirmNewPassword:
+*                 type: string
+*                 example: "newPassword"
+*     responses:
+*       200:
+*         description: Password successful changed
+*         content:
+*          application/json:
+*           example: {
+*             "message": "Password successful changed"
+*           }
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {
+*               "message": "Validation error",
+*               "errors": []
+*             }
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example: {
+*                "message": "User not authorized",
+*                "errors": []
+*             }
+*/
 router.post(
   AuthRouteEndpoint.CHANGE_PASSWORD,
   authMiddleware,
@@ -250,6 +332,38 @@ router.post(
   AuthController.changePassword
 );
 
+/**
+* @openapi
+* '/api/auth/send-otp':
+*  post:
+*     tags:
+*     - AUTHENTICATION
+*     summary: Send one time password
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           example:
+*             {
+*               "email": "user@gmail.com"
+*             }
+*     responses:
+*       200:
+*         description: Code successful sent
+*         content:
+*          application/json:
+*           example: {
+*             "message": "Code successful sent"
+*           }
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {
+*               "message": "User not found",
+*               "errors": []
+*             }
+*/
 router.post(
   AuthRouteEndpoint.SEND_OTP,
   emailValidation,
@@ -257,6 +371,38 @@ router.post(
   AuthController.sendOtp
 );
 
+/**
+* @openapi
+* '/api/auth/resend-otp':
+*  post:
+*     tags:
+*     - AUTHENTICATION
+*     summary: Resend one time password
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           example:
+*             {
+*               "email": "user@gmail.com"
+*             }
+*     responses:
+*       200:
+*         description: Code successful resent
+*         content:
+*          application/json:
+*           example: {
+*             "message": "Code successful resent"
+*           }
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {
+*               "message": "User not found",
+*               "errors": []
+*             }
+*/
 router.post(
   AuthRouteEndpoint.RESEND_OTP,
   emailValidation,
@@ -264,6 +410,53 @@ router.post(
   AuthController.reSendOtp
 );
 
+/**
+* @openapi
+* '/api/auth/reset-password':
+*  post:
+*     tags:
+*     - AUTHENTICATION
+*     summary: Reset password with otp code
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               email:
+*                 type: string
+*                 example: "user@gmail.com"
+*               code:
+*                 type: integer
+*                 example: 123456
+*                 description: "Otp code"
+*               newPassword:
+*                 type: string
+*                 example: "newPassword"
+*                 minLength: 3
+*                 maxLength: 32
+*                 description: "Password must be between 3 and 32 characters"
+*               confirmNewPassword:
+*                 type: string
+*                 example: "newPassword"
+*     responses:
+*       200:
+*         description: Password successful recovered
+*         content:
+*          application/json:
+*           example: {
+*             "message": "Password successful recovered"
+*           }
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {
+*               "message": "User not found",
+*               "errors": []
+*             }
+*/
 router.post(
   AuthRouteEndpoint.RESET_PASSWORD,
   body('code').isNumeric().isLength({ min: 6, max: 6 }),
