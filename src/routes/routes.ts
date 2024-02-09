@@ -92,7 +92,8 @@ enum AuthRouteEndpoint {
 *             example:
 *                "message": "User already exist"
 *                "errors": []
-*/router.post(
+*/
+router.post(
   AuthRouteEndpoint.REGISTER,
   emailValidation,
   passwordValidation('password'),
@@ -677,7 +678,7 @@ router.get(
 *                  positionAtWork: "positionArWork"
 *                  shortBiography: "shortBiography"
 *                  educationAndGoals: "educationAndGoals"
-*                  avatar: "avatars-2549c1ea-d841-4632-8b14-21637f782e.jpg"
+*                  avatar: "avatars"
 *                  createdAt: "2024-02-09T12:29:53.816Z"
 *       500:
 *         description: Unexpected error
@@ -776,6 +777,79 @@ enum NewsRouteEndpoint {
   DELETE_NEWS = '/news/delete-news/:id',
 }
 
+/**
+* @openapi
+* '/api/news/create-news':
+*  post:
+*     tags:
+*     - NEWS
+*     summary: Create news
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               title:
+*                 type: string
+*                 description: The news title.
+*               shortDescribe:
+*                 type: string
+*                 description: Short description of the news.
+*               posters:
+*                 type: file
+*                 description: The poster for the news.
+*               content:
+*                 type: object
+*                 description: The content of the news.
+*                 properties:
+*                  title:
+*                    type: string
+*                    description: The title of the section.
+*                  paragraph:
+*                    type: string
+*                    description: The text of the section.
+*               newsImages:
+*                 type: files
+*                 description: Images related to the news.
+*           example:
+*             title: "Title"
+*             shortDescribe: "ShortDescription"
+*             posters: "poster"
+*             content: {"title": "Section1", "paragraph": "innerText"}
+*             newsImages: "newsImages"
+*     responses:
+*       200:
+*         description: News created
+*         content:
+*          application/json:
+*           example:
+*           - "message": "News successful created"
+*             "news":
+*             - "id": "newsId"
+*               "title": "NewsTitle"
+*               "poster": "poster"
+*               "shortDescribe": "ShortDescription"
+*               "content": [{"title": "Section1", "paragraph": "innerText"}]
+*               "newsImages": [ "newsImage", "newsImage"]
+*               "lastUpdate": null
+*               "updatedBy": "Not updated yet"
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {"message": "You are not a admin", "errors": []}
+*/
 router.post(
   NewsRouteEndpoint.CREATE_NEWS,
   authMiddleware,
@@ -787,6 +861,63 @@ router.post(
   async (req: RequestForMulter, res, next) => await NewsController.createNews(req, res, next)
 );
 
+/**
+* @openapi
+* '/api/news':
+*  get:
+*     tags:
+*     - NEWS
+*     summary: Get news
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: query
+*       name: limit
+*       schema:
+*         type: integer
+*       required: false
+*       description: The number of items to return per page
+*     - in: query
+*       name: page
+*       schema:
+*         type: integer
+*       required: false
+*       description: The page number to return
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     responses:
+*       200:
+*         description: News list
+*         content:
+*          application/json:
+*           example:
+*             total: 10
+*             totalPages: 10
+*             currentPage: 1
+*             hasNextPage: true
+*             hasPrevPage: false
+*             perPage: 1
+*             results:
+*               - "id": "newId"
+*                 "title": "New"
+*                 "poster": "poster"
+*                 "shortDescribe": "ShortDescription"
+*                 "content": [{"title": "Section1", "paragraph": "innerText"}]
+*                 "newsImages": [ "newsImage", "newsImage"]
+*                 "lastUpdate": null
+*                 "updatedBy": "Not updated yet"
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
+*/
 router.get(
   NewsRouteEndpoint.NEWS,
   authMiddleware,
