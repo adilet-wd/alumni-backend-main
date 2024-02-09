@@ -48,6 +48,25 @@ export interface News extends Document {
   lastUpdate?: string
   updatedBy?: string
 }
+
+export interface vacancyContacts {
+  whatsapp: string
+  telegram: string
+  email: string
+}
+
+export interface Vacancy extends Document {
+  companyName: string
+  companyLogo: string
+  salary: string
+  requirements: string
+  position: string
+  contacts: vacancyContacts[]
+  createdAt?: string
+  lastUpdate?: string
+  updatedBy?: string
+}
+
 export interface Token {
   user: Schema.Types.ObjectId
   refreshToken: string
@@ -77,13 +96,15 @@ declare global {
 export enum CollectionNames {
   USER = 'User',
   TOKEN = 'Token',
-  NEWS = 'News'
+  NEWS = 'News',
+  VACANCY = 'Vacancy'
 }
 
 export enum ImageFolders {
   AVATARS = 'avatars',
   NEWS_IMAGES = 'newsImages',
-  POSTERS = 'posters'
+  POSTERS = 'posters',
+  COMPANY_LOGOS = 'companyLogos'
 }
 
 export enum Errors {
@@ -100,7 +121,8 @@ export enum Errors {
   OTP_INCORRECT = 'Otp code are not correct',
   OTP_DID_NOT_SEND = 'You did not send opt code, please send firstly',
   NEWS_NOT_FOUND = 'News not found',
-  POSTER_REQUIRED = 'Poster required'
+  POSTER_REQUIRED = 'Poster required',
+  LOGO_REQUIRED = 'Logo required'
 }
 
 export enum Success {
@@ -113,7 +135,10 @@ export enum Success {
   NEWS_DELETED = 'News successful deleted',
   NEWS_CREATED = 'News successful created',
   NEWS_UPDATED = 'News successful updated',
-  USER_UPDATED = 'User successful updated'
+  USER_UPDATED = 'User successful updated',
+  VACANCY_DELETED = 'Vacancy successful deleted',
+  VACANCY_CREATED = 'Vacancy successful created',
+  VACANCY_UPDATED = 'Vacancy successful updated',
 }
 
 export enum ValidationMessages {

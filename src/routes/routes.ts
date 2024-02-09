@@ -10,6 +10,7 @@ import { ImageFolders, ValidationMessages, type RequestForMulter } from '../type
 import { fileUploader } from '../helpers/file-uploader';
 import { AuthController } from '../controllers/auth-controller';
 import { ImageController } from '../controllers/image-controller';
+import { VacancyController } from '../controllers/vacancy-controller';
 
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
@@ -1118,12 +1119,116 @@ router.delete(
   NewsController.deleteNewsById
 );
 
+enum VacanciesRouteEndpoint {
+  VACANCIES = '/vacancies',
+  NEWS_BY_ID = '/vacancies/:id',
+  CREATE_VACANCY = '/vacancies/create-vacancy',
+  UPDATE_NEWS = '/vacancies/update-vacancies/:id',
+  DELETE_NEWS = '/vacancies/delete-vacancies/:id',
+}
+
+/**
+* @openapi
+* '/api/vacancies/create-vacancy':
+*  post:
+*     tags:
+*     - VACANCIES
+*     summary: Create vacancy
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               companyName:
+*                 type: string
+*                 description: The company name.
+*               companyLogos:
+*                 type: file
+*                 description: The logo of company.
+*               contacts:
+*                 type: object
+*                 description: The contacts of the company.
+*                 properties:
+*                  whatsapp:
+*                    type: string
+*                    description: Whatsapp number.
+*                  telegram:
+*                    type: string
+*                    description: Telegram number.
+*                  email:
+*                    type: string
+*                    description: email.
+*               salary:
+*                 type: string
+*                 description: The salary of the position.
+*               requirements:
+*                 type: string
+*                 description: The requirements of the position.
+*               position:
+*                 type: string
+*                 description: The position in the company.
+*           example:
+*             companyName: "companyName"
+*             companyLogos: "companyLogos"
+*             salary: "salary"
+*             content: {"whatsapp": "+380123456789", "telegram": "+380123456789", "email": "emailForCheck@gmail.com"}
+*             requirements: "requirements"
+*             position: "position"
+*     responses:
+*       200:
+*         description: Vacancy created
+*         content:
+*          application/json:
+*           example:
+*           - "message": "Vacancy successful created"
+*             "vacancy":
+*             - "id": "vacancyId"
+*               companyName: "companyName"
+*               companyLogos: "companyLogos"
+*               salary: "salary"
+*               requirements: "requirements"
+*               position: "position"
+*               contacts: {"whatsapp": "+380123456789", "telegram": "+380123456789", "email": "emailForCheck@gmail.com"}
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {"message": "You are not a admin", "errors": []}
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
+*/
+router.post(
+  VacanciesRouteEndpoint.CREATE_VACANCY,
+  authMiddleware,
+  roleCheckMiddleware,
+  fileUploader.single(ImageFolders.COMPANY_LOGOS),
+  VacancyController.createVacancy
+);
+
 enum ImagesRouteEndpoints {
   AVATAR = '/images/avatars/:filepath',
   POSTER = '/images/posters/:filepath',
   NEWS_IMAGE = '/images/newsImages/:filepath',
+  COMPANY_LOGO = '/images/companyLogos/:filepath'
 }
 
 router.get(ImagesRouteEndpoints.AVATAR, ImageController.getAvatar);
 router.get(ImagesRouteEndpoints.POSTER, ImageController.getPoster);
 router.get(ImagesRouteEndpoints.NEWS_IMAGE, ImageController.getNewsImage);
+router.get(ImagesRouteEndpoints.COMPANY_LOGO, ImageController.getCompanyLogo);

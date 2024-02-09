@@ -12,6 +12,8 @@ const storage: StorageEngine = multer.diskStorage({
         return ImageFolders.POSTERS;
       } else if (file.fieldname === ImageFolders.NEWS_IMAGES) {
         return ImageFolders.NEWS_IMAGES;
+      } else if (file.fieldname === ImageFolders.COMPANY_LOGOS) {
+        return ImageFolders.COMPANY_LOGOS;
       }
 
       return '';
