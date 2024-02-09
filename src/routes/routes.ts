@@ -585,6 +585,115 @@ router.get(
   UserController.getProfile
 );
 
+/**
+* @openapi
+* '/api/user/update-profile':
+*  patch:
+*     tags:
+*     - PROFILE
+*     summary: Update user profile
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               name:
+*                 type: string
+*                 description: The user's name.
+*               surname:
+*                 type: string
+*                 description: The user's surname.
+*               education:
+*                 type: enum
+*                 description: The user's education. ENUM type.
+*                 enum: ["Среднее-Профессиональное","Бакалавриат", "Магистратура", "Докторантура", "Аспирантура", null]
+*               specialty:
+*                 type: enum
+*                 description: The user's specialty. ENUM type.
+*                 enum: ["Программист", "Врач", "Психолог", "Переводчик", null]
+*               yearOfRelease:
+*                 type: number
+*                 description: The year the user was released.
+*               place:
+*                 type: string
+*                 description: The user's place.
+*               workPlace:
+*                 type: string
+*                 description: The user's workplace.
+*               positionAtWork:
+*                 type: string
+*                 description: The user's position at work.
+*               shortBiography:
+*                 type: string
+*                 description: A short biography of the user.
+*               educationAndGoals:
+*                 type: string
+*                 description: The user's education and goals.
+*               avatars:
+*                 type: file
+*                 description: The user's avatars.
+*           example:
+*             name: "name"
+*             surname: "surname"
+*             education: "education"
+*             specialty: "specialty"
+*             yearOfRelease: 2023
+*             place: "place"
+*             workPlace: "workPlace"
+*             positionAtWork: "positionAtWork"
+*             shortBiography: "shortBiography"
+*             educationAndGoals: "educationAndGoals"
+*             avatars: "avatars"
+*     responses:
+*       200:
+*         description: Users list
+*         content:
+*          application/json:
+*           example:
+*              message: "User successful updated"
+*              user:
+*                  id: "userId"
+*                  name: "Alex"
+*                  surname: "Smith"
+*                  email: "kanatbekovich36@gmail.com"
+*                  isAdmin: false
+*                  education: "Бакалавриат"
+*                  specialty: "Программист"
+*                  yearOfRelease: 2023
+*                  place: "place"
+*                  phoneNumber: "+380123456789"
+*                  workPlace: "workPlace"
+*                  positionAtWork: "positionArWork"
+*                  shortBiography: "shortBiography"
+*                  educationAndGoals: "educationAndGoals"
+*                  avatar: "avatars-2549c1ea-d841-4632-8b14-21637f782e.jpg"
+*                  createdAt: "2024-02-09T12:29:53.816Z"
+*       500:
+*         description: Unexpected error
+*         content:
+*          application/json:
+*           example:
+*              message: "Unexpected error"
+*              errors: []
+*       401:
+*         description: User not authorized
+*         content:
+*          application/json:
+*           example:
+*              message: "User not authorized"
+*              errors: []
+*/
 router.patch(
   UserRouteEndpoint.UPDATE_PROFILE,
   authMiddleware,
