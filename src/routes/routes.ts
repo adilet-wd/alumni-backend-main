@@ -955,7 +955,7 @@ router.get(
 *         content:
 *          application/json:
 *           example:
-*           - "id": "newsId"
+*             "id": "newsId"
 *             "title": "NewsTitle"
 *             "poster": "poster"
 *             "shortDescribe": "ShortDescription"
@@ -1121,10 +1121,10 @@ router.delete(
 
 enum VacanciesRouteEndpoint {
   VACANCIES = '/vacancies',
-  NEWS_BY_ID = '/vacancies/:id',
+  VACANCY_BY_ID = '/vacancies/:id',
   CREATE_VACANCY = '/vacancies/create-vacancy',
-  UPDATE_NEWS = '/vacancies/update-vacancies/:id',
-  DELETE_NEWS = '/vacancies/delete-vacancies/:id',
+  UPDATE_VACANCY = '/vacancies/update-vacancy/:id',
+  DELETE_VACANCY = '/vacancies/delete-vacancy/:id',
 }
 
 /**
@@ -1219,6 +1219,280 @@ router.post(
   roleCheckMiddleware,
   fileUploader.single(ImageFolders.COMPANY_LOGOS),
   VacancyController.createVacancy
+);
+
+/**
+* @openapi
+* '/api/vacancies/update-vacancy/{id}':
+*  put:
+*     tags:
+*     - VACANCIES
+*     summary: Update vacancy by MongoDB id
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: path
+*       name: id
+*       schema:
+*         type: string
+*       required: true
+*       description: The MongoDB id of the vacancy
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               companyName:
+*                 type: string
+*                 description: The company name.
+*               companyLogos:
+*                 type: file
+*                 description: The logo of company.
+*               contacts:
+*                 type: object
+*                 description: The contacts of the company.
+*                 properties:
+*                  whatsapp:
+*                    type: string
+*                    description: Whatsapp number.
+*                  telegram:
+*                    type: string
+*                    description: Telegram number.
+*                  email:
+*                    type: string
+*                    description: email.
+*               salary:
+*                 type: string
+*                 description: The salary of the position.
+*               requirements:
+*                 type: string
+*                 description: The requirements of the position.
+*               position:
+*                 type: string
+*                 description: The position in the company.
+*           example:
+*             companyName: "companyName"
+*             companyLogos: "companyLogos"
+*             salary: "salary"
+*             content: {"whatsapp": "+380123456789", "telegram": "+380123456789", "email": "emailForCheck@gmail.com"}
+*             requirements: "requirements"
+*             position: "position"
+*     responses:
+*       200:
+*         description: Vacancy successful updated
+*         content:
+*          application/json:
+*           example:
+*           - "message": "successful updated"
+*             "vacancy":
+*             - "id": "vacancyId"
+*               companyName: "companyName"
+*               companyLogos: "companyLogos"
+*               salary: "salary"
+*               requirements: "requirements"
+*               position: "position"
+*               contacts: {"whatsapp": "+380123456789", "telegram": "+380123456789", "email": "emailForCheck@gmail.com"}
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {"message": "You are not a admin", "errors": []}
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
+*/
+router.put(
+  VacanciesRouteEndpoint.UPDATE_VACANCY,
+  authMiddleware,
+  roleCheckMiddleware,
+  isMongoId,
+  fileUploader.single(ImageFolders.COMPANY_LOGOS),
+  VacancyController.updateVacancyById
+);
+
+/**
+* @openapi
+* '/api/vacancies/delete-vacancy/{id}':
+*  delete:
+*     tags:
+*     - VACANCIES
+*     summary: Delete vacancy by MongoDB id
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: path
+*       name: id
+*       schema:
+*         type: string
+*       required: true
+*       description: The MongoDB id of the vacancy
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     responses:
+*       200:
+*         description: Vacancy successful deleted
+*         content:
+*          application/json:
+*           example:
+*           - "message": "Vacancy successful deleted"
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {"message": "You are not a admin", "errors": []}
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
+*/
+router.delete(
+  VacanciesRouteEndpoint.DELETE_VACANCY,
+  authMiddleware,
+  roleCheckMiddleware,
+  isMongoId,
+  VacancyController.deleteVacancyById
+);
+
+/**
+* @openapi
+* '/api/vacancies/{id}':
+*  get:
+*     tags:
+*     - VACANCIES
+*     summary: Get vacancy by MongoDB id
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: path
+*       name: id
+*       schema:
+*         type: string
+*       required: true
+*       description: The MongoDB id of the vacancy
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     responses:
+*       200:
+*         description: Vacancy
+*         content:
+*          application/json:
+*           example:
+*               "id": "vacancyId"
+*               companyName: "companyName"
+*               companyLogos: "companyLogos"
+*               salary: "salary"
+*               requirements: "requirements"
+*               position: "position"
+*               contacts: {"whatsapp": "+380123456789", "telegram": "+380123456789", "email": "emailForCheck@gmail.com"}
+*               "lastUpdate": time
+*               "updatedBy": "user@gmail.com"
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*                "message": "User not authorized"
+*                "errors": []
+*       400:
+*         description: Bad request
+*         content:
+*           application/json:
+*             example: {"message": "Vacancy not found", "errors": []}
+*/
+router.get(
+  VacanciesRouteEndpoint.VACANCY_BY_ID,
+  authMiddleware,
+  isMongoId,
+  VacancyController.getVacancyById
+);
+
+/**
+* @openapi
+* '/api/vacancies':
+*  get:
+*     tags:
+*     - VACANCIES
+*     summary: Get vacancies
+*     security:
+*     - bearerAuth: []
+*     parameters:
+*     - in: query
+*       name: limit
+*       schema:
+*         type: integer
+*       required: false
+*       description: The number of items to return per page
+*     - in: query
+*       name: page
+*       schema:
+*         type: integer
+*       required: false
+*       description: The page number to return
+*     - in: header
+*       name: Authorization
+*       schema:
+*         type: string
+*       required: true
+*       description: refresh token (bearer)
+*     responses:
+*       200:
+*         description: Vacancies list
+*         content:
+*          application/json:
+*           example:
+*             total: 10
+*             totalPages: 10
+*             currentPage: 1
+*             hasNextPage: true
+*             hasPrevPage: false
+*             perPage: 1
+*             results:
+*               - "id": "vacancyId"
+*                 "companyName": "companyName"
+*                 "companyLogos": "companyLogos"
+*                 "salary": "salary"
+*                 "requirements": "requirements"
+*                 "position": "position"
+*                 "contacts": {"whatsapp": "+380123456789", "telegram": "+380123456789", "email": "emailForCheck@gmail.com"}
+*                 "lastUpdate": time
+*                 "updatedBy": "user@gmail.com"
+*       401:
+*         description: Unathorized
+*         content:
+*           application/json:
+*             example:
+*               "message": "User not authorized"
+*               "errors": []
+*/
+router.get(
+  VacanciesRouteEndpoint.VACANCIES,
+  authMiddleware,
+  query('limit').default('10'),
+  query('page').default('1'),
+  VacancyController.getVacancies
 );
 
 enum ImagesRouteEndpoints {

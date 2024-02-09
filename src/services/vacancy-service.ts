@@ -9,39 +9,38 @@ interface updateVacancyProps {
   id: string
   email: string
   fields: Partial<Vacancy>
-  poster: undefined | string
-  newsImages: undefined | string[]
+  companyLogo: undefined | string
 }
 
 class Service {
-  // async getNews (limit: number, page: number): Promise<PaginationResponse<VacancyDto>> {
-  //   const news = await paginate(VacancyModel, page, limit);
-  //   const dtoNews = news.results.map((nw: News) => new VacancyDto(nw));
-  //   return {
-  //     ...news,
-  //     results: dtoNews
-  //   };
-  // }
+  async getVacancies (limit: number, page: number): Promise<PaginationResponse<VacancyDto>> {
+    const vacancy = await paginate(VacancyModel, page, limit);
+    const dtoVacancy = vacancy.results.map((nw: Vacancy) => new VacancyDto(nw));
+    return {
+      ...vacancy,
+      results: dtoVacancy
+    };
+  }
 
-  // async getNewsById (id: string): Promise<VacancyDto | undefined> {
-  //   const news = await VacancyModel.findById(id);
+  async getVacancyById (id: string): Promise<VacancyDto | undefined> {
+    const vacancy = await VacancyModel.findById(id);
 
-  //   if (news === null) {
-  //     throw ApiError.BadRequest(Errors.NEWS_NOT_FOUND);
-  //   }
+    if (vacancy === null) {
+      throw ApiError.BadRequest(Errors.VACANCY_NOT_FOUND);
+    }
 
-  //   return new VacancyDto(news);
-  // }
+    return new VacancyDto(vacancy);
+  }
 
-  // async deleteNewsById (id: string): Promise<{ message: string } | undefined> {
-  //   const news = await VacancyModel.findByIdAndDelete(id);
+  async deleteVacancyById (id: string): Promise<{ message: string } | undefined> {
+    const vacancy = await VacancyModel.findByIdAndDelete(id);
 
-  //   if (news === null) {
-  //     throw ApiError.BadRequest(Errors.NEWS_NOT_FOUND);
-  //   }
+    if (vacancy === null) {
+      throw ApiError.BadRequest(Errors.VACANCY_NOT_FOUND);
+    }
 
-  //   return { message: Success.NEWS_DELETED };
-  // }
+    return { message: Success.VACANCY_DELETED };
+  }
 
   async createVacancy (vacancy: Partial<Vacancy>): Promise<{ message: string, vacancy: VacancyDto }> {
     const newVacancy = await VacancyModel.create(vacancy);
@@ -52,48 +51,39 @@ class Service {
     };
   }
 
-  // async updateNewsById (props: updateNewsProps): Promise<{ message: string, news: VacancyDto } | undefined> {
-  //   const { poster, fields, id, newsImages, email } = props;
+  async updateVacancyById (props: updateVacancyProps): Promise<{ message: string, news: VacancyDto } | undefined> {
+    const { companyLogo, fields, id, email } = props;
 
-  //   const prevNews = await VacancyModel.findById(id);
+    const prevVacancy = await VacancyModel.findById(id);
 
-  //   if (prevNews === null) {
-  //     throw ApiError.BadRequest(Errors.NEWS_NOT_FOUND);
-  //   }
+    if (prevVacancy === null) {
+      throw ApiError.BadRequest(Errors.VACANCY_NOT_FOUND);
+    }
 
-  //   if (newsImages !== undefined) {
-  //     if (prevNews.newsImages.length !== 0) {
-  //       prevNews.newsImages.forEach((image): void => {
-  //         ImageService.removeImage(ImageFolders.NEWS_IMAGES, image);
-  //       });
-  //     }
-  //     fields.newsImages = newsImages;
-  //   }
+    if (companyLogo !== undefined) {
+      ImageService.removeImage(ImageFolders.COMPANY_LOGOS, prevVacancy.companyLogo);
+      fields.companyLogo = companyLogo;
+    }
 
-  //   if (poster !== undefined) {
-  //     ImageService.removeImage(ImageFolders.POSTERS, prevNews.poster);
-  //     fields.poster = poster;
-  //   }
+    await prevVacancy.save();
 
-  //   await prevNews.save();
+    const vacancy = await VacancyModel.findByIdAndUpdate(id, {
+      updatedBy: email,
+      lastUpdate: new Date().toISOString(),
+      ...fields
+    }, { returnDocument: 'after' });
 
-  //   const news = await VacancyModel.findByIdAndUpdate(id, {
-  //     updatedBy: email,
-  //     lastUpdate: new Date().toISOString(),
-  //     ...fields
-  //   }, { returnDocument: 'after' });
+    if (vacancy === null) {
+      throw ApiError.BadRequest(Errors.VACANCY_NOT_FOUND);
+    }
 
-  //   if (news === null) {
-  //     throw ApiError.BadRequest(Errors.NEWS_NOT_FOUND);
-  //   }
+    await vacancy.save();
 
-  //   await news.save();
-
-  //   return {
-  //     message: Success.NEWS_UPDATED,
-  //     news: new VacancyDto(news)
-  //   };
-  // }
+    return {
+      message: Success.VACANCY_UPDATED,
+      news: new VacancyDto(vacancy)
+    };
+  }
 }
 
 export const VacancyService = new Service();

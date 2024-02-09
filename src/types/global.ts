@@ -121,6 +121,7 @@ export enum Errors {
   OTP_INCORRECT = 'Otp code are not correct',
   OTP_DID_NOT_SEND = 'You did not send opt code, please send firstly',
   NEWS_NOT_FOUND = 'News not found',
+  VACANCY_NOT_FOUND = 'Vacancy not found',
   POSTER_REQUIRED = 'Poster required',
   LOGO_REQUIRED = 'Logo required'
 }

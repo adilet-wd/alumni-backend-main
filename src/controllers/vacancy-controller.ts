@@ -5,37 +5,37 @@ import { ApiError } from '../exeptions/api-error-exeption';
 import { Errors } from '../types/global';
 
 class Controller {
-  // async getNews (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
-  //   try {
-  //     const errors: Result<ValidationError> = validationResult(req);
+  async getVacancies (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
+    try {
+      const errors: Result<ValidationError> = validationResult(req);
 
-  //     if (!errors.isEmpty()) {
-  //       next(ApiError.BadRequest(Errors.VALIDATE_ERROR, errors.array())); return;
-  //     }
-  //     const page: number = parseInt(req.query.page as string, 10) || 1;
-  //     const limit: number = parseInt(req.query.limit as string, 10) || 10;
+      if (!errors.isEmpty()) {
+        next(ApiError.BadRequest(Errors.VALIDATE_ERROR, errors.array())); return;
+      }
+      const page: number = parseInt(req.query.page as string, 10) || 1;
+      const limit: number = parseInt(req.query.limit as string, 10) || 10;
 
-  //     const news = await NewsService.getNews(limit, page);
-  //     return res.json(news);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+      const vacancy = await VacancyService.getVacancies(limit, page);
+      return res.json(vacancy);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  // async getNewsById (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
-  //   try {
-  //     const errors: Result<ValidationError> = validationResult(req);
+  async getVacancyById (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
+    try {
+      const errors: Result<ValidationError> = validationResult(req);
 
-  //     if (!errors.isEmpty()) {
-  //       next(ApiError.BadRequest(Errors.VALIDATE_ERROR, errors.array())); return;
-  //     }
-  //     const id = req.params.id;
-  //     const news = await NewsService.getNewsById(id);
-  //     return res.json(news);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+      if (!errors.isEmpty()) {
+        next(ApiError.BadRequest(Errors.VALIDATE_ERROR, errors.array())); return;
+      }
+      const id = req.params.id;
+      const vacancy = await VacancyService.getVacancyById(id);
+      return res.json(vacancy);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   async createVacancy (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
     try {
@@ -52,12 +52,6 @@ class Controller {
         throw ApiError.BadRequest(Errors.LOGO_REQUIRED);
       }
 
-      // if (companyLogo !== undefined) {
-      //   companyLogo = req.files.companyLogo[0].filename;
-      // } else {
-      //   throw ApiError.BadRequest(Errors.POSTER_REQUIRED);
-      // }
-
       const vacancy = await VacancyService.createVacancy({
         companyName,
         salary,
@@ -72,50 +66,41 @@ class Controller {
     }
   }
 
-  // async deleteNewsById (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
-  //   try {
-  //     const errors: Result<ValidationError> = validationResult(req);
+  async deleteVacancyById (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
+    try {
+      const errors: Result<ValidationError> = validationResult(req);
 
-  //     if (!errors.isEmpty()) {
-  //       next(ApiError.BadRequest(Errors.VALIDATE_ERROR, errors.array())); return;
-  //     }
+      if (!errors.isEmpty()) {
+        next(ApiError.BadRequest(Errors.VALIDATE_ERROR, errors.array())); return;
+      }
 
-  //     const id = req.params.id;
-  //     const news = await NewsService.deleteNewsById(id);
-  //     return res.json(news);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+      const id = req.params.id;
+      const vacancy = await VacancyService.deleteVacancyById(id);
+      return res.json(vacancy);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-  // async updateNewById (req: RequestForMulter, res: Response, next: NextFunction): Promise<Response | undefined> {
-  //   try {
-  //     const errors: Result<ValidationError> = validationResult(req);
-  //     let poster: string | undefined;
-  //     let newsImages: string[] | undefined;
-
-  //     if (!errors.isEmpty()) {
-  //       next(ApiError.BadRequest(Errors.VALIDATE_ERROR, errors.array())); return;
-  //     }
-
-  //     if (req.files.posters !== undefined) {
-  //       poster = req.files.posters[0].filename;
-  //     }
-
-  //     if (req.files.newsImages !== undefined) {
-  //       newsImages = req.files.newsImages.map((file) => file.filename);
-  //     }
-
-  //     const id = req.params.id;
-  //     const news = await NewsService.updateNewsById(
-  //       { fields: req.body, poster, newsImages, id, email: req.user.email }
-  //     );
-
-  //     return res.json(news);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+  async updateVacancyById (req: Request, res: Response, next: NextFunction): Promise<Response | undefined> {
+    try {
+      const errors: Result<ValidationError> = validationResult(req);
+      if (!errors.isEmpty()) {
+        next(ApiError.BadRequest(Errors.VALIDATE_ERROR, errors.array())); return;
+      }
+      let companyLogo: string | undefined;
+      if (req.file?.filename !== undefined) {
+        companyLogo = req.file?.filename;
+      }
+      const id = req.params.id;
+      const vacancy = await VacancyService.updateVacancyById(
+        { fields: req.body, companyLogo, id, email: req.user.email }
+      );
+      return res.json(vacancy);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const VacancyController = new Controller();
